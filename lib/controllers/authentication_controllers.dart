@@ -88,6 +88,7 @@ checkRegisterValidationandApprove(){
 
   if(isRegisterEmailValid.value && isRegisterPassowrdCorrect.value && isFullNameNotEmpty.value){
     registerUser() ;
+
   }
 }
 
@@ -131,6 +132,8 @@ user.reauthenticateWithCredential(cred).then((value) {
   user.updatePassword(registerPassWordCn.text).then((_) {
     //Success
       Get.snackbar("Successfully changed password", "",backgroundColor: Colors.green,colorText: Colors.white);
+      setcontrollersEmty();
+
       Get.off(SettingsScreen());
   }).catchError((error) {
     //Error,
@@ -168,6 +171,8 @@ deleteuser(String email) async{
 user.reauthenticateWithCredential(cred).then((value) async{
   try {
   await FirebaseAuth.instance.currentUser!.delete();
+      setcontrollersEmty();
+
 } on FirebaseAuthException catch (e) {
   if (e.code == 'requires-recent-login') {
     print('The user must reauthenticate before this operation can be executed.');
@@ -200,7 +205,9 @@ registerUser() async{
 
      if (user != null) {
        _addUserDetails(user.uid);
+     
       Get.snackbar("Account created Successfully", "Now you can login to your account",backgroundColor: Colors.green,colorText: Colors.white);
+      setcontrollersEmty();
       Get.off(LoginScreen());
       // setState(() {
       //   _success = true;
@@ -246,7 +253,8 @@ Future<void> _signInWithEmailAndPassword() async {
         password: loginPassWordCn.text,
   );
       Get.snackbar("Signed in Successfully", "",backgroundColor: Colors.green,colorText: Colors.white);
-
+      setcontrollersEmty();
+  
    Get.off(HomeScreen());
 } on FirebaseAuthException catch (e) {
   if (e.code == 'user-not-found') {
@@ -273,6 +281,17 @@ checkforLOgin(){
     }
   });
 
+}
+
+
+
+setcontrollersEmty(){
+  emailController.text = "";
+  loginPassWordCn.text = "";
+  registerEmailCn.text = "";
+  registerPassWordCn.text = "";
+  fullNameCn.text = "";
+  confirmPassWordCn.text = "";
 }
 }
 
