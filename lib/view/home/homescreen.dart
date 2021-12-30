@@ -1,7 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pigolearn_round1/controllers/bookmark_controller.dart';
 import 'package:pigolearn_round1/controllers/search_controller.dart';
+import 'package:pigolearn_round1/controllers/theme_controller.dart';
 import 'package:pigolearn_round1/data/network/NetworkApiService.dart';
+import 'package:pigolearn_round1/widget/drawer.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
@@ -21,6 +25,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
 final searchController = Get.find<SearchController>();
+final bookmarkController = Get.find<BookMarkController>();
+  final themeCn = Get.find<ThemeController>();
 
 
  @override
@@ -61,9 +67,22 @@ final searchController = Get.find<SearchController>();
     var size = MediaQuery.of(context).size;
     return  Scaffold(
       appBar: AppBar(
-        title: const Text("PingoLearn-Round 1"),
+        title: const Text("PingoLearn Round-2"),
         centerTitle: true,
+        actions: [
+         Obx(()=>  searchController.searchWord.value != "" ? Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: bookmarkController.isItemBookMarked.value ?  const Icon(Icons.bookmark) : InkWell(
+              onTap: () async{
+                bookmarkController.bookMarkTheWord(searchController.searchWord.value, searchController.meaning.value, searchController.example.value, searchController.imageUrl.value);
+                bookmarkController.isItemBookMarked(true);
+                Get.snackbar(" ${searchController.searchWord.value} added to Bookmark", "",snackPosition:SnackPosition.BOTTOM,colorText: Colors.white,backgroundColor: Colors.grey, );
+              },
+              child: const Icon(Icons.bookmark_add_outlined)),
+          ): Container()) 
+        ],
       ),
+      drawer:  DrawerWidget(),
       body: Container(
         width: size.width,
         height: size.height,
@@ -92,7 +111,6 @@ final searchController = Get.find<SearchController>();
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                        
                   const SizedBox(
                    height: 5
                  ),
@@ -107,13 +125,13 @@ final searchController = Get.find<SearchController>();
                       )
                     ],
                   ),
-                  color: Colors.grey[200],),
+                  color: themeCn.isDarkMode.value? Colors.grey[800]: Colors.grey[200],),
 
                   const SizedBox(
                    height: 30
                  ),
 
-                    Container(height: 100,
+                 Container(height: 100,
                   width: 300,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -133,16 +151,13 @@ final searchController = Get.find<SearchController>();
                       )
                     ],
                   ),
-                  color: Colors.grey[200],),
- const SizedBox(
+                  color:  themeCn.isDarkMode.value? Colors.grey[800]: Colors.grey[200],),
+                 const SizedBox(
                    height: 30
                  ),
-                  Image.network(searchController.imageUrl.value,height: 150,width: 150,)
+                searchController.imageUrl.value == "" ? Image.asset("assets/images/image_not_found.png",height: 150,width: 150,):  Image.network(searchController.imageUrl.value,height: 150,width: 150,)
                   ],
                 ),
-
-               
-               
               ElevatedButton(
                 child: Icon(Icons.mic),
                 style: ButtonStyle(
